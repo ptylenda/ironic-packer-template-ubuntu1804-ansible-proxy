@@ -8,7 +8,7 @@
     "http_proxy": "{{env `http_proxy` }}",
     "https_proxy": "{{env `https_proxy` }}",
     "hyperv_switchname": "{{env `hyperv_switchname` }}",
-    "image_name": "Ubuntu1804-kubernetes",
+    "image_name": "ubuntu1804-kubernetes",
     "iso_checksum": "a7f5c7b0cdd0e9560d78f1e47660e066353bb8a79eb78d1fc3f4ea62a07e6cbc",
     "iso_checksum_type": "sha256",
     "iso_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/ubuntu-18.04-server-amd64.iso",
@@ -24,6 +24,10 @@
         "<esc><wait10><esc><esc><enter><wait>",
         "linux /install/vmlinuz ",
         "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{ user `preseed` }} ",
+        "net.ifnames=0 ",
+        "biosdevname=0 ",
+        "interface=auto ",
+        "netcfg/dhcp_timeout=60 ",
         "debconf/priority=critical ",
         "auto-install/enable=true ",
         "hostname={{.Name}} ",
@@ -72,6 +76,10 @@
         "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
         "/install/vmlinuz noapic ",
         "file=/floppy/{{ user `preseed` }} ",
+        "net.ifnames=0 ",
+        "biosdevname=0 ",
+        "interface=auto ",
+        "netcfg/dhcp_timeout=60 ",
         "debconf/priority=critical ",
         "auto-install/enable=true ",
         "hostname={{.Name}} ",
@@ -134,6 +142,25 @@
         "no_proxy={{ user `no_proxy` }}"
       ],
       "execute_command": "echo '{{ user `password` }}' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "expect_disconnect": true,
+      "scripts": [
+        "./scripts/serial_console.sh"
+      ],
+      "type": "shell"
+    },
+    {
+      "environment_vars": [
+        "FTP_PROXY={{ user `ftp_proxy` }}",
+        "HTTPS_PROXY={{ user `https_proxy` }}",
+        "HTTP_PROXY={{ user `http_proxy` }}",
+        "NO_PROXY={{ user `no_proxy` }}",
+        "ftp_proxy={{ user `ftp_proxy` }}",
+        "http_proxy={{ user `http_proxy` }}",
+        "https_proxy={{ user `https_proxy` }}",
+        "no_proxy={{ user `no_proxy` }}"
+      ],
+      "execute_command": "echo '{{ user `password` }}' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "pause_before": "15s",
       "scripts": [
         "./scripts/update.sh",
         "./scripts/hyperv.sh"
